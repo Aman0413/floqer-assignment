@@ -14,7 +14,8 @@ function App() {
       <h1 className="text-2xl font-bold mt-8 mb-4 text-center p-4">Number of Jobs Over Time</h1>
       <LineGraph />
 
-      <div>
+      <div className='p-4'>
+        <h1 className="text-2xl font-bold mb-4 text-center p-4">Chat-Bot</h1>
         <Chat />
       </div>
     </div>
