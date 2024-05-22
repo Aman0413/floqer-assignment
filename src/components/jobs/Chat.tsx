@@ -1,11 +1,39 @@
-// src/components/Chat.tsx
 import React, { useState } from 'react';
 import axios from 'axios';
+import jobsData from '../../data/data.json'
 
 interface Message {
     role: 'user' | 'assistant';
     content: string;
 }
+
+const preprocessData = () => {
+    const aggregatedData: { [year: string]: { totalJobs: number, averageSalary: number, jobTitles: { [title: string]: number } } } = {};
+
+    jobsData.forEach(job => {
+        if (!aggregatedData[job.work_year]) {
+            aggregatedData[job.work_year] = { totalJobs: 0, averageSalary: 0, jobTitles: {} };
+        }
+
+        aggregatedData[job.work_year].totalJobs += 1;
+        aggregatedData[job.work_year].averageSalary += job.salary_in_usd;
+
+        if (!aggregatedData[job.work_year].jobTitles[job.job_title]) {
+            aggregatedData[job.work_year].jobTitles[job.job_title] = 0;
+        }
+
+        aggregatedData[job.work_year].jobTitles[job.job_title] += 1;
+    });
+
+    // Calculate average salary
+    for (const year in aggregatedData) {
+        aggregatedData[year].averageSalary /= aggregatedData[year].totalJobs;
+    }
+
+    return aggregatedData;
+};
+
+const aggregatedData = preprocessData();
 
 const Chat: React.FC = () => {
     const [messages, setMessages] = useState<Message[]>([]);
@@ -19,15 +47,22 @@ const Chat: React.FC = () => {
         setInput('');
 
         try {
-            const response = await axios.post('https://api.openai.com/v1/chat/completions', {
-                model: 'gpt-3.5-turbo',
-                messages: [...messages, userMessage],
-            }, {
-                headers: {
-                    'Authorization': `Bearer ${process.env.REACT_APP_OPENAI_API_KEY}`,
-                    'Content-Type': 'application/json',
+            const response = await axios.post(
+                'https://api.openai.com/v1/chat/completions',
+                {
+                    model: 'gpt-3.5-turbo',
+                    messages: [...messages, userMessage, {
+                        role: 'system',
+                        content: `You are an assistant that helps users analyze job market data. Here's the aggregated data you should use for reference: ${JSON.stringify(aggregatedData)}`,
+                    }],
+                },
+                {
+                    headers: {
+                        Authorization: `Bearer ${process.env.REACT_APP_OPENAI_API_KEY}`,
+                        'Content-Type': 'application/json',
+                    },
                 }
-            });
+            );
 
             const assistantMessage: Message = {
                 role: 'assistant',
@@ -60,7 +95,7 @@ const Chat: React.FC = () => {
                     onKeyPress={(e) => e.key === 'Enter' && handleSend()}
                     className="flex-1 p-2 border rounded-md"
                 />
-                <button onClick={handleSend} className="ml-4 p-2 bg-green-500 text-white rounded-md">Send</button>
+                <button onClick={handleSend} className="ml-4 p-2 bg-blue-500 text-white rounded-md">Send</button>
             </div>
         </div>
     );

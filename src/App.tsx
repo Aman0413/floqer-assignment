@@ -1,5 +1,6 @@
 
 import './App.css'
+import Chat from './components/jobs/Chat';
 import LineGraph from './components/jobs/LineGraph';
 import MainTable from './components/jobs/MainTable';
 
@@ -12,6 +13,10 @@ function App() {
       <MainTable />
       <h1 className="text-2xl font-bold mt-8 mb-4 text-center p-4">Number of Jobs Over Time</h1>
       <LineGraph />
+
+      <div>
+        <Chat />
+      </div>
     </div>
   );
 
