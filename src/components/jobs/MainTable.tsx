@@ -3,9 +3,6 @@ import React, { useState, useMemo } from 'react';
 import AggregatedJobTitlesTable from './AggregatedJobTitlesTable';
 import jobData from '../../data/data.json';
 
-
-
-
 interface YearStats {
     year: number;
     totalJobs: number;

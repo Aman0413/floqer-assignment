@@ -1,4 +1,4 @@
-// src/components/AggregatedJobTitlesTable.tsx
+
 import React, { useMemo } from 'react';
 
 interface Job {
